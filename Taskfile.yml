@@ -1,0 +1,31 @@
+# ┌───────────────────────────────────────────────────────────────────┐
+# │                                                                   │
+# │                          IMPORTANT NOTE                           │
+# │                                                                   │
+# │   This file is synced with https://github.com/atomicgo/template   │
+# │                                                                   │
+# │        Please apply all changes to the template repository        │
+# │                                                                   │
+# └───────────────────────────────────────────────────────────────────┘
+
+version: "3"
+
+tasks:
+  test:
+    desc: Run all tests
+    cmds:
+      - go test ./...
+  tdd:
+    desc: Test Driven Development - Watch tests
+    watch: true
+    sources:
+      - "**/*.go"
+    cmds:
+      - go test ./...
+
+  lint:
+    desc: Run all linters
+    cmds:
+      - go mod tidy
+      - wsl --allow-cuddle-declarations --force-err-cuddling --force-case-trailing-whitespace 3 --fix ./...
+      - golangci-lint run

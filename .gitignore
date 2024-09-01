@@ -1,0 +1,53 @@
+# ┌───────────────────────────────────────────────────────────────────┐
+# │                                                                   │
+# │                          IMPORTANT NOTE                           │
+# │                                                                   │
+# │   This file is synced with https://github.com/atomicgo/template   │
+# │                                                                   │
+# │        Please apply all changes to the template repository        │
+# │                                                                   │
+# └───────────────────────────────────────────────────────────────────┘
+
+# Binaries
+*.exe
+*.exe~
+*.so
+
+# Go specifics
+
+## Test binary, built with `go test -c`
+*.test
+
+## Output of the go coverage tool
+*.out
+
+## Vendored dependencies
+vendor/
+
+# IDEs
+
+## IntelliJ
+.idea
+*.iml
+out
+gen
+
+## Visual Studio Code
+.vscode
+*.code-workspace
+
+# Operating System Files
+
+## macOS
+.DS_Store
+
+# Other 
+
+## Experimenting folder
+experimenting
+
+## CI assets
+.templates
+
+## Taskfile
+.task
