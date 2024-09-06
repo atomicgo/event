@@ -172,8 +172,13 @@ linters-settings:
       - d any # generic any (e.g. data)
       - data any # generic data
       - n any # generic any
+      - ch chan T # common generic channel name
+      - ch chan int # common generic channel name
+      - ch chan any # common generic channel name
+      - wg sync.WaitGroup # common generic WaitGroup name
       - t time.Time # often used as a variable name
       - f func() # often used as a callback variable name
+      - f func(T) # often used as a generic callback variable name
       - cb func() # often used as a callback variable name
       - t testing.T # default testing.T variable name
       - b testing.B # default testing.B variable name
