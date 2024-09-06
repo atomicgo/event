@@ -33,7 +33,7 @@
 </a>
 
 <a href="https://codecov.io/gh/atomicgo/event">
-<!-- unittestcount:start --><img src="https://img.shields.io/badge/Unit_Tests-1-magenta?style=flat-square" alt="Unit test count"><!-- unittestcount:end -->
+<!-- unittestcount:start --><img src="https://img.shields.io/badge/Unit_Tests-2-magenta?style=flat-square" alt="Unit test count"><!-- unittestcount:end -->
 </a>
 
 <a href="https://opensource.org/licenses/MIT" target="_blank">
@@ -102,10 +102,15 @@ import (
 	"atomicgo.dev/event"
 )
 
+func delay() {
+	time.Sleep(time.Millisecond * 10)
+}
+
 type Player struct {
 	Name string
 }
 
+// Create a new event
 var PlayerJoinEvent = event.New[Player]()
 
 func main() {
@@ -114,7 +119,7 @@ func main() {
 		fmt.Printf("Player %q joined the game\n", p.Name)
 	})
 
-	PlayerJoinEvent.Listen(func(p Player) {
+	PlayerJoinEvent.Listen(func(_ Player) {
 		// Do something else
 	})
 
@@ -122,7 +127,9 @@ func main() {
 
 	// Trigger the event somewhere - can be in a different function or package
 	PlayerJoinEvent.Trigger(Player{Name: "Marvin"})
+	delay() // delay for deterministic output
 	PlayerJoinEvent.Trigger(Player{Name: "Bob"})
+	delay() // delay for deterministic output
 	PlayerJoinEvent.Trigger(Player{Name: "Alice"})
 
 	// Keep the program alive
@@ -151,7 +158,7 @@ Player "Alice" joined the game
 
 
 <a name="Event"></a>
-## type [Event](<https://github.com/atomicgo/event/blob/main/event.go#L6-L9>)
+## type [Event](<https://github.com/atomicgo/event/blob/main/event.go#L6-L10>)
 
 Event represents an event system that can handle multiple listeners.
 
@@ -162,25 +169,88 @@ type Event[T any] struct {
 ```
 
 <a name="New"></a>
-### func [New](<https://github.com/atomicgo/event/blob/main/event.go#L11>)
+### func [New](<https://github.com/atomicgo/event/blob/main/event.go#L13>)
 
 ```go
 func New[T any]() *Event[T]
 ```
 
-
+New creates a new event.
 
 <a name="Event[T].Close"></a>
-### func \(\*Event\[T\]\) [Close](<https://github.com/atomicgo/event/blob/main/event.go#L44>)
+### func \(\*Event\[T\]\) [Close](<https://github.com/atomicgo/event/blob/main/event.go#L64>)
 
 ```go
 func (e *Event[T]) Close()
 ```
 
+Close closes the event and all its listeners. After calling this method, the event can't be used anymore and new listeners can't be added.
+
+
+
+
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	"atomicgo.dev/event"
+)
+
+func delay() {
+	time.Sleep(time.Millisecond * 10)
+}
+
+func main() {
+	// Create a new event
+	exampleEvent := event.New[int]()
+
+	// Listen to the event
+	exampleEvent.Listen(func(v int) {
+		fmt.Println(v)
+	})
+
+	// Trigger the event
+	exampleEvent.Trigger(1)
+	delay() // delay for deterministic output
+	exampleEvent.Trigger(2)
+	delay() // delay for deterministic output
+	exampleEvent.Trigger(3)
+
+	// Time for listeners to process the event
+	delay()
+
+	// Close the event
+	exampleEvent.Close()
+
+	// Trigger the event again
+	exampleEvent.Trigger(4)
+	delay() // delay for deterministic output
+	exampleEvent.Trigger(5)
+	delay() // delay for deterministic output
+	exampleEvent.Trigger(6)
+
+	// Keep the program alive
+	time.Sleep(time.Second)
+
+}
+```
+
+#### Output
+
+```
+1
+2
+3
+```
+
 
 
 <a name="Event[T].Listen"></a>
-### func \(\*Event\[T\]\) [Listen](<https://github.com/atomicgo/event/blob/main/event.go#L30>)
+### func \(\*Event\[T\]\) [Listen](<https://github.com/atomicgo/event/blob/main/event.go#L35>)
 
 ```go
 func (e *Event[T]) Listen(f func(T))
@@ -189,7 +259,7 @@ func (e *Event[T]) Listen(f func(T))
 Listen gets called when the event is triggered.
 
 <a name="Event[T].Trigger"></a>
-### func \(\*Event\[T\]\) [Trigger](<https://github.com/atomicgo/event/blob/main/event.go#L18>)
+### func \(\*Event\[T\]\) [Trigger](<https://github.com/atomicgo/event/blob/main/event.go#L21>)
 
 ```go
 func (e *Event[T]) Trigger(value T)
