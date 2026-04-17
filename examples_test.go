@@ -83,3 +83,44 @@ func ExampleEvent_Close() {
 	// 2
 	// 3
 }
+
+func ExampleEvent_StopListening() {
+
+	// Create a new event
+	exampleEvent := event.New[string]()
+
+	// Listen to the event
+	triggerCount := 0
+	listen_id, _ := exampleEvent.ListenWithID(func(v string) {
+		triggerCount++
+		fmt.Printf("%d - %s\n", triggerCount, v)
+	})
+
+	// Trigger the event
+	exampleEvent.Trigger("foo")
+	delay() // delay for deterministic output
+	exampleEvent.Trigger("bar")
+	delay() // delay for deterministic output
+	exampleEvent.Trigger("baz")
+
+	// Time for listeners to process the event
+	delay()
+
+	// Stop listening
+	exampleEvent.StopListening(listen_id)
+
+	// Trigger the event again
+	exampleEvent.Trigger("foo")
+	delay() // delay for deterministic output
+	exampleEvent.Trigger("bar")
+	delay() // delay for deterministic output
+	exampleEvent.Trigger("baz")
+
+	// Keep the program alive
+	time.Sleep(time.Second)
+
+	// Output:
+	// 1 - foo
+	// 2 - bar
+	// 3 - baz
+}

@@ -8,17 +8,23 @@ import (
 // ErrEventClosed is returned when an operation is attempted on a closed event.
 var ErrEventClosed = errors.New("event is closed")
 
+// ErrUnknownListener is returned when attempting to unregister an unknown id
+var ErrUnknownListener = errors.New("listener id is unknown")
+
 // Event represents a generic, thread-safe event system that can handle multiple listeners.
 // The type parameter T specifies the type of data that the event carries when triggered.
 type Event[T any] struct {
-	listeners []func(T)
+	listeners map[int]func(T)
 	mu        sync.RWMutex
 	closed    bool
+	next_id   int
 }
 
 // New creates and returns a new Event instance for the specified type T.
 func New[T any]() *Event[T] {
-	return &Event[T]{}
+	return &Event[T]{
+		listeners: make(map[int]func(T)),
+	}
 }
 
 // Trigger notifies all registered listeners by invoking their callback functions with the provided value.
@@ -33,8 +39,10 @@ func (e *Event[T]) Trigger(value T) error {
 
 	// Copy the listeners to avoid holding the lock during execution.
 	// This ensures that triggering the event is thread-safe even if listeners are added or removed concurrently.
-	listeners := make([]func(T), len(e.listeners))
-	copy(listeners, e.listeners)
+	var listeners []func(T)
+	for _, l := range e.listeners {
+		listeners = append(listeners, l)
+	}
 	e.mu.RUnlock()
 
 	var wg sync.WaitGroup
@@ -56,16 +64,47 @@ func (e *Event[T]) Trigger(value T) error {
 // The listener will be invoked with the event's data whenever Trigger is called.
 // Returns ErrEventClosed if the event has been closed.
 func (e *Event[T]) Listen(f func(T)) error {
+	_, err := e.ListenWithID(f)
+	return err
+
+}
+
+// ListenWithID registers a new listener callback function for the event.
+// The listener will be invoked with the event's data whenever Trigger is called.
+// Returns ErrEventClosed if the event has been closed.
+// It behaves exactly as Listen, but also returns an ID which can be used
+// with StopListening to deregister the listener
+func (e *Event[T]) ListenWithID(f func(T)) (int, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
 	if e.closed {
-		return ErrEventClosed
+		return -1, ErrEventClosed
 	}
 
-	e.listeners = append(e.listeners, f)
+	id := e.getID()
 
+	e.listeners[id] = f
+
+	return id, nil
+}
+
+func (e *Event[T]) StopListening(id int) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	_, ok := e.listeners[id]
+	if !ok {
+		return ErrUnknownListener
+	}
+	delete(e.listeners, id)
 	return nil
+}
+
+func (e *Event[T]) getID() int {
+	id := e.next_id
+	e.next_id++
+	return id
 }
 
 // Close closes the event system, preventing any new listeners from being added or events from being triggered.
