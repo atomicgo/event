@@ -39,7 +39,7 @@ func (e *Event[T]) Trigger(value T) error {
 
 	// Copy the listeners to avoid holding the lock during execution.
 	// This ensures that triggering the event is thread-safe even if listeners are added or removed concurrently.
-	var listeners []func(T)
+	listeners := make([]func(T), 0, len(e.listeners))
 	for _, l := range e.listeners {
 		listeners = append(listeners, l)
 	}
