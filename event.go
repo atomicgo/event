@@ -91,6 +91,9 @@ func (e *Event[T]) ListenWithID(f func(T)) (int, error) {
 	return id, nil
 }
 
+// StopListening unregisters a listener, using the ID returned from Listen.
+// The callback which was registered with that ID will no longer be called
+// and any associated resources will be released.
 func (e *Event[T]) StopListening(id int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
