@@ -22,9 +22,7 @@ type Event[T any] struct {
 
 // New creates and returns a new Event instance for the specified type T.
 func New[T any]() *Event[T] {
-	return &Event[T]{
-		listeners: make(map[int]func(T)),
-	}
+	return &Event[T]{}
 }
 
 // Trigger notifies all registered listeners by invoking their callback functions with the provided value.
@@ -66,7 +64,6 @@ func (e *Event[T]) Trigger(value T) error {
 func (e *Event[T]) Listen(f func(T)) error {
 	_, err := e.ListenWithID(f)
 	return err
-
 }
 
 // ListenWithID registers a new listener callback function for the event.
@@ -77,6 +74,11 @@ func (e *Event[T]) Listen(f func(T)) error {
 func (e *Event[T]) ListenWithID(f func(T)) (int, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+
+	// Lazy init to allow use of zero value
+	if e.listeners == nil {
+		e.listeners = make(map[int]func(T))
+	}
 
 	if e.closed {
 		return -1, ErrEventClosed
