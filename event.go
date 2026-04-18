@@ -8,7 +8,7 @@ import (
 // ErrEventClosed is returned when an operation is attempted on a closed event.
 var ErrEventClosed = errors.New("event is closed")
 
-// ErrUnknownListener is returned when attempting to unregister an unknown id
+// ErrUnknownListener is returned when attempting to unregister an unknown id.
 var ErrUnknownListener = errors.New("listener id is unknown")
 
 // Event represents a generic, thread-safe event system that can handle multiple listeners.
