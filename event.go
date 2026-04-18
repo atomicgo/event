@@ -17,7 +17,7 @@ type Event[T any] struct {
 	listeners map[int]func(T)
 	mu        sync.RWMutex
 	closed    bool
-	next_id   int
+	nextID    int
 }
 
 // New creates and returns a new Event instance for the specified type T.
@@ -102,8 +102,8 @@ func (e *Event[T]) StopListening(id int) error {
 }
 
 func (e *Event[T]) getID() int {
-	id := e.next_id
-	e.next_id++
+	id := e.nextID
+	e.nextID++
 	return id
 }
 
