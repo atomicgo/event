@@ -85,7 +85,6 @@ func ExampleEvent_Close() {
 }
 
 func ExampleEvent_StopListening() {
-
 	// Create a new event
 	exampleEvent := event.New[string]()
 
