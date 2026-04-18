@@ -90,7 +90,7 @@ func ExampleEvent_StopListening() {
 
 	// Listen to the event
 	triggerCount := 0
-	listenID, _ := exampleEvent.ListenWithID(func(v string) {
+	listenID, _ := exampleEvent.Listen(func(v string) {
 		triggerCount++
 		fmt.Printf("%d - %s\n", triggerCount, v)
 	})

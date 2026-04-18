@@ -60,18 +60,9 @@ func (e *Event[T]) Trigger(value T) error {
 
 // Listen registers a new listener callback function for the event.
 // The listener will be invoked with the event's data whenever Trigger is called.
+// Returns an ID which can be used with StopListening to deregister the listener.
 // Returns ErrEventClosed if the event has been closed.
-func (e *Event[T]) Listen(f func(T)) error {
-	_, err := e.ListenWithID(f)
-	return err
-}
-
-// ListenWithID registers a new listener callback function for the event.
-// The listener will be invoked with the event's data whenever Trigger is called.
-// Returns ErrEventClosed if the event has been closed.
-// It behaves exactly as Listen, but also returns an ID which can be used
-// with StopListening to deregister the listener
-func (e *Event[T]) ListenWithID(f func(T)) (int, error) {
+func (e *Event[T]) Listen(f func(T)) (int, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -94,6 +85,7 @@ func (e *Event[T]) ListenWithID(f func(T)) (int, error) {
 // StopListening unregisters a listener, using the ID returned from Listen.
 // The callback which was registered with that ID will no longer be called
 // and any associated resources will be released.
+// If the ID passed in is not registered, ErrUnknownListener will be returned.
 func (e *Event[T]) StopListening(id int) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
