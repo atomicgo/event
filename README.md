@@ -187,7 +187,7 @@ func New[T any]() *Event[T]
 New creates and returns a new Event instance for the specified type T.
 
 <a name="Event[T].Close"></a>
-### func \(\*Event\[T\]\) [Close](<https://github.com/atomicgo/event/blob/main/event.go#L74>)
+### func \(\*Event\[T\]\) [Close](<https://github.com/atomicgo/event/blob/main/event.go#L76>)
 
 ```go
 func (e *Event[T]) Close()
@@ -259,7 +259,7 @@ func main() {
 
 
 <a name="Event[T].Listen"></a>
-### func \(\*Event\[T\]\) [Listen](<https://github.com/atomicgo/event/blob/main/event.go#L58>)
+### func \(\*Event\[T\]\) [Listen](<https://github.com/atomicgo/event/blob/main/event.go#L60>)
 
 ```go
 func (e *Event[T]) Listen(f func(T)) error
