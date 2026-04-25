@@ -26,6 +26,7 @@ func New[T any]() *Event[T] {
 // Returns ErrEventClosed if the event has been closed.
 func (e *Event[T]) Trigger(value T) error {
 	e.mu.RLock()
+
 	if e.closed {
 		e.mu.RUnlock()
 		return ErrEventClosed
@@ -43,6 +44,7 @@ func (e *Event[T]) Trigger(value T) error {
 
 		go func(f func(T)) {
 			defer wg.Done()
+
 			f(value)
 		}(listener)
 	}
